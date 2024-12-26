@@ -1,0 +1,65 @@
+name: Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - 'v*' # 当推送以v开头的tag时触发，如 v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        
+    - name: Create extension package
+      run: |
+        # 创建一个临时目录用于打包
+        mkdir -p dist
+        
+        # 复制必要的文件到dist目录
+        cp manifest.json dist/
+        cp background.js dist/
+        cp options.html dist/
+        cp options.js dist/
+        cp README.md dist/
+        
+        # 复制store-assets目录（如果需要）
+        cp -r store-assets dist/
+        
+        # 进入dist目录
+        cd dist
+        
+        # 创建zip包
+        zip -r ../chrome-html-copier.zip *
+      
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release ${{ env.VERSION }}
+        files: chrome-html-copier.zip
+        body: |
+          AI文本助手 Chrome扩展 v${{ env.VERSION }}
+          
+          ## 更新内容
+          - 请在此处添加版本更新说明
+          
+          ## 安装方法
+          1. 下载 chrome-html-copier.zip
+          2. 解压到本地文件夹
+          3. 打开Chrome浏览器，进入扩展管理页面 (chrome://extensions/)
+          4. 开启"开发者模式"
+          5. 点击"加载已解压的扩展程序"
+          6. 选择解压后的文件夹即可
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "AI文本助手",
+  "description": "复制当前页面的HTML代码",
+  "version": "1.0",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "clipboardWrite",
+    "storage",
+    "contextMenus"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {},
+  "options_page": "options.html"
+}
